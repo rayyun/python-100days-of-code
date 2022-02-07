@@ -1,4 +1,4 @@
-# Day82-Professional Portfolio Project 2 : Tic Tae Toe Game
+# Day83-Professional Portfolio Project 2 : Tic Tae Toe Game
 from colorama import Fore, Back, Style, init
 
 init()

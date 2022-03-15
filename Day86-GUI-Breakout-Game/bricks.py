@@ -1,7 +1,6 @@
 from turtle import Turtle
 import random
 
-
 COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "cyan", "gray"]
 X_LIST = [-280, -170, -60, 50, 160, 270]
 Y_LIST = [280, 255, 230, 205, 180]
@@ -30,9 +29,6 @@ class Bricks:
                 ball.bounce_y()
                 self.all_bricks.remove(brick)
                 scoreboard.increase_score()
-
-
-
 
     def break_brick(self):
         pass

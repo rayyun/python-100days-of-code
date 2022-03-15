@@ -17,7 +17,6 @@ paddle = Paddle()
 x, y = paddle.pos()
 print("x: {x}, y: {y}")
 ball = Ball((x, y+19))
-# angle = random.randint(100, 145)
 
 bricks = Bricks()
 bricks.create_bricks()
@@ -37,7 +36,6 @@ while game_on:
     screen.update()
     ball.move(paddle)
 
-    # if ball.xcor
     bricks.ball_collision(ball, scoreboard)
 
     if len(bricks.all_bricks) < 0 or ball.ycor() < -300:

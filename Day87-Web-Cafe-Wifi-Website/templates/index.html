@@ -1,0 +1,132 @@
+{% include "header.html" %}
+
+
+    <!-- ======= Hero Section ======= -->
+    <section id="hero">
+        <div id="heroCarousel" class="carousel slide" data-bs-interval="5000" data-bs-ride="carousel">
+
+			<ol class="carousel-indicators">
+				<li data-target="#heroCarousel" data-slide-to="0" class="active"></li>
+				<li data-target="#heroCarousel" data-slide-to="1"></li>
+				<li data-target="#heroCarousel" data-slide-to="2"></li>
+			</ol>
+
+            <div class="carousel-inner">
+
+                <!-- Slide 1 -->
+<!--                <div class="carousel-item active" style="background-image: url(static/img/slide/nathan-dumlao-I_394sxx0ec-unsplash.jpg)">-->
+                <div class="carousel-item active" style="background-image: url(static/img/slide/slide-1.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">Welcome to London Cafes</h2>
+                            <p class="animated fadeInUp">Find the laptop friendly cafes.</p>
+                            <a href="#coffee-shops" class="btn-get-started animated fadeInUp scrollto">See Cafes</a>
+                            <a href="/add" class="btn-get-started">Add Cafe</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Slide 2 -->
+<!--                <div class="carousel-item" style="background-image: url(static/img/slide/stefen-tan-FWPu4IWk-wM-unsplash.jpg)">-->
+                <div class="carousel-item" style="background-image: url(static/img/slide/slide-2.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">Coffee</h2>
+                            <p class="animated fadeInUp">Find the laptop friendly cafes.</p>
+                            <a href="#coffee-shops" class="btn-get-started animated fadeInUp scrollto">See Cafes</a>
+                            <a href="/add" class="btn-get-started">Add Cafe</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+<!--                <div class="carousel-item" style="background-image: url(static/img/slide/shawnanggg-nmpW_WwwVSc-unsplash.jpg.jpg)">-->
+                <div class="carousel-item" style="background-image: url(static/img/slide/slide-3.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">WiFi</h2>
+                            <p class="animated fadeInUp">Find the laptop friendly cafes.</p>
+                            <a href="#coffee-shops" class="btn-get-started animated fadeInUp scrollto">See Cafes</a>
+                            <a href="/add" class="btn-get-started">Add Cafe</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+            </a>
+
+            <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+            </a>
+
+        </div>
+    </section><!-- End Hero -->
+
+
+
+    <!-- ======= Coffee Shops Section ======= -->
+    <section id="coffee-shops" class="coffee-shops">
+
+        <div class="section-title">
+            <h2>Coffee Shops</h2>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3">
+        {% for cafe in all_cafes %}
+
+            <div class="col-lg-4 d-flex justify-content-center mt-5 align-items-stretch">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{ cafe.img_url }}" style="height:215px" ; class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ cafe.name }}</h5>
+                        <div class="row">
+                            <div class="col-lg-6 mb-3">
+                                <h6 class="card-subtitle text-muted mb-1"> {{ cafe.location }} </h6>
+                                <a href="{{ cafe.map_url }}" class="card-link" target="_blank"> Google Maps </a>
+                                <p class="card-text mt-2">
+                                    <i class="fas fa-coffee mr-3" aria-hidden="true"></i> {{ cafe.coffee_price }}
+                                    <br>
+                                    <i class="fas fa-chair mr-3" aria-hidden="true"></i> {{ cafe.seats}}
+                                </p>
+                            </div>
+                            <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                                <a href="{{ url_for('delete_cafe', cafe_id=cafe.id) }}" class="btn btn-delete">Delete</a>
+                            </div>
+                        </div>
+                        <p class="card-text items">
+                            {% if cafe.has_wifi == 1 %}
+                            <i class="fas fa-wifi" aria-hidden="true"></i>
+                            {% endif %}
+                            {% if cafe.has_sockets == 1 %}
+                            <i class="fas fa-plug" style="width: 1.25rem; text-align:center" aria-hidden="true"></i>
+                            {% endif %}
+                            {% if cafe.has_toilet == 1 %}
+                            <i class="fas fa-toilet" aria-hidden="true"></i>
+                            {% endif %}
+                            {% if cafe.can_take_calls == 1 %}
+                            <i class="fas fa-phone" aria-hidden="true"></i>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+{% include "footer.html" %}

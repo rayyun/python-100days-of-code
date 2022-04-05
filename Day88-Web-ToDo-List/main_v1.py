@@ -34,7 +34,7 @@ db.create_all()
 def home():
     todo_list = db.session.query(TaskList).all()
 
-    return render_template("index.html", todo_list=todo_list)
+    return render_template("index_v1.html", todo_list=todo_list)
 
 
 @app.route("/add_item", methods=["POST"])

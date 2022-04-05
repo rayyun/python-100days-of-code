@@ -1,0 +1,60 @@
+{% include "header_v1.html" %}
+
+<section class="vh-100" style="background-color: #e2d5de;">
+  <div class="container py-5">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-xl-10">
+
+        <div class="card" style="border-radius: 15px;">
+          <div class="card-body p-5">
+
+
+            <form action="/add_item", method="POST" class="d-flex justify-content-center align-items-center mb-4">
+              <div class="form-outline flex-fill py-3" >
+                <input autofocus="autofocus" autocomplete="off" type="text" name="item_name" placeholder="Write your next task here..." required="required" id="form3" class="form-control form-control-lg" />
+<!--                <input autocomplete="off" type="text" name="item_name" placeholder="Write your next task here..." required="required" id="form3" class="form-control form-control-lg" />-->
+<!--                <label class="form-label" for="form3">Write your next task here...</label>-->
+              </div>
+               <input type="submit" name="go" value="Submit" style="display: none">
+
+            </form>
+
+            <hr class="my-4">
+
+            <ul class="list-group mb-0">
+
+            {% for todo in todo_list %}
+
+              <li class="list-group-item d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2">
+                <div class="d-flex align-items-center">
+                  <form action="/update_item", method="POST">
+                  <input type="hidden" name="todo_id" value="{{ todo.id }}">
+
+                  {% if todo.status == False %}
+                  <input class="form-check-input me-2" type="checkbox" onClick="submit();" aria-label="done / undo" />
+                    {{ todo.name }}
+                  {% else %}
+                  <input class="form-check-input me-2" type="checkbox" onClick="submit();" aria-label="done / undo" checked/>
+                    <s>{{ todo.name }}</s>
+                  {% endif %}
+                </form>
+
+                </div>
+                <a href="/delete_item/{{ todo.id }}" data-mdb-toggle="tooltip" title="Remove item">
+                  <i class="fas fa-times text-primary"></i>
+                </a>
+              </li>
+
+                {% endfor %}
+            </ul>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

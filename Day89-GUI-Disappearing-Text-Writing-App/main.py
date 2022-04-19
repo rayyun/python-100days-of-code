@@ -30,6 +30,7 @@ def onKeyPress(event):
         text.config(fg="#111111")
 
     write_on = True
+
     if event.keysym == 'Return' or event.keysym == "space":
         wordsInput += 1
 
@@ -46,6 +47,12 @@ def noAction(event):
         text.mark_set("insert", startIndex)
     else:
         text.mark_set("insert", END)
+
+
+def start_timer():
+    if window.after_id is not None:
+        window.after_cancel(window.after_id)
+    count_down(5)
 
 
 def count_down(count):
@@ -67,11 +74,7 @@ def change_color(count):
     border_color = ["red", "red", "purple", "blue", "white", "white"]
 
     text.config(fg=font_color[count])
-    if count > 3:
-        window.config(highlightbackground=border_color[count], highlightcolor=border_color[count])
-
-    else:
-        window.config(highlightbackground=border_color[count], highlightcolor=border_color[count])
+    window.config(highlightbackground=border_color[count], highlightcolor=border_color[count])
 
 
 def screen_off():
@@ -92,12 +95,6 @@ def restart():
     screen_on()
     text.config(height=20, state="normal")
     ready()
-
-
-def start_timer():
-    if window.after_id is not None:
-        window.after_cancel(window.after_id)
-    count_down(5)
 
 
 window = Tk()

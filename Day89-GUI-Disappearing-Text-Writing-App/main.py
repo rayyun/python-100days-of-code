@@ -52,12 +52,12 @@ def noAction(event):
 def start_timer():
     if window.after_id is not None:
         window.after_cancel(window.after_id)
-    count_down(5)
+    count_down(12)
 
 
 def count_down(count):
     if count > 0:
-        window.after_id = window.after(1000, count_down, count - 1)
+        window.after_id = window.after(600, count_down, count - 1)
     else:
         window.after_id = None
 
@@ -70,8 +70,8 @@ def count_down(count):
 
 
 def change_color(count):
-    font_color = ["red", "red", "purple", "blue", "black", "black"]
-    border_color = ["red", "red", "purple", "blue", "white", "white"]
+    font_color = ["#FF8080", "#FF6666", "#FF4D4D", "#FF3333", "#FF1919", "#FF0000", "#DD0000", "#BB0000", "#9A0000", "#790001", "#5A0004", "#3A0002", "#111111"]
+    border_color = ["#DD0000", "#FF0000", "#FF1919", "#FF3333","#FF4D4D", "#FF6666", "#FF8080", "#FF9999", "#FFB3B3", "#FFCCCC", "#FFE6E6", "white", "white"]
 
     text.config(fg=font_color[count])
     window.config(highlightbackground=border_color[count], highlightcolor=border_color[count])

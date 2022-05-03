@@ -1,0 +1,17 @@
+.color{
+    width: 20%;
+    float: left;
+    height: 25%;
+    position: relative;
+    cursor: pointer;
+}
+
+h2{
+    color: transparent;
+}
+
+img{
+    width:500px;
+    display:block;
+    padding-bottom:30px;
+}

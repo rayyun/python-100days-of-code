@@ -9,9 +9,11 @@
     <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="static/css/main.css">
 
+
 </head>
 <body>
-    <form id="fileForm" action = "/" method = "POST" enctype = "multipart/form-data" accept="image/gif, image/jpeg, image/png">
+<!--    <form id="fileForm" action = "/" method = "POST" enctype = "multipart/form-data" accept="image/gif, image/jpeg, image/png">-->
+    <form id="fileForm" action = "/" method = "POST" enctype = "multipart/form-data">
         <input type="file" name="img_file" accept="image/*" onchange="loadFile(event)">
         <br>
         <img id="output" src="{{ imgpath }}">
@@ -22,8 +24,13 @@
     {% for color in colors %}
 
     <div class="color" style="background-color:rgb({{color[0]}},{{color[1]}},{{color[2]}});">
-        <span>{{ '#' + ('%02x%02x%02x' % (color[0], color[1], color[2])).upper() }}</span>
+        {% if color[0] + color[1] + color[2] < 500 %}
+        <span style="color:white">{{ '#' + ('%02x%02x%02x' % (color[0], color[1], color[2])).upper() }}</span>
+        {% else %}
+        <span style="color:black">{{ '#' + ('%02x%02x%02x' % (color[0], color[1], color[2])).upper() }}</span>
+        {% endif %}
     </div>
+
     {% endfor %}
     {% endif %}
 

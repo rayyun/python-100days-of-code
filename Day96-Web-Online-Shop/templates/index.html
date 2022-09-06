@@ -1,0 +1,176 @@
+{% include "header.html" %}
+
+
+    <!-- ======= Hero Section ======= -->
+    <section id="hero">
+        <div id="heroCarousel" class="carousel slide" data-bs-interval="5000" data-bs-ride="carousel">
+
+			<ol class="carousel-indicators">
+				<li data-target="#heroCarousel" data-slide-to="0" class="active"></li>
+				<li data-target="#heroCarousel" data-slide-to="1"></li>
+				<li data-target="#heroCarousel" data-slide-to="2"></li>
+			</ol>
+
+            <div class="carousel-inner">
+
+                <!-- Slide 1 -->
+<!--                <div class="carousel-item active" style="background-image: url(static/img/slide/nathan-dumlao-I_394sxx0ec-unsplash.jpg)">-->
+                <div class="carousel-item active" style="background-image: url(static/img/slide/slide-1.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">Welcome to Plant Shop</h2>
+                            <p class="animated fadeInUp">Find the greens for your space.</p>
+                            <a href="#plant-shops" class="btn-get-started animated fadeInUp">Shop Plants</a>
+<!--                            <a href="#plant-shops" class="btn-get-started animated fadeInUp scrollto">Shop Plants</a>-->
+<!--                            <a href="/add" class="btn-get-started">Shop Plants</a>-->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Slide 2 -->
+<!--                <div class="carousel-item" style="background-image: url(static/img/slide/stefen-tan-FWPu4IWk-wM-unsplash.jpg)">-->
+                <div class="carousel-item" style="background-image: url(static/img/slide/slide-2.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">Plants</h2>
+                            <p class="animated fadeInUp">Find the greens for your space.</p>
+                            <a href="#plant-shops" class="btn-get-started animated fadeInUp">Shop Plants</a>
+<!--                            <a href="#plant-shops" class="btn-get-started animated fadeInUp scrollto">Shop Plants</a>-->
+<!--                            <a href="/add" class="btn-get-started">Shop Plants</a>-->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+<!--                <div class="carousel-item" style="background-image: url(static/img/slide/shawnanggg-nmpW_WwwVSc-unsplash.jpg.jpg)">-->
+                <div class="carousel-item" style="background-image: url(static/img/slide/slide-3.jpg)">
+                    <div class="carousel-container">
+                        <div class="container">
+                            <h2 class="animated fadeInDown">Greens</h2>
+                            <p class="animated fadeInUp">Find the greens for your space.</p>
+                            <a href="#plant-shops" class="btn-get-started animated fadeInUp">Shop Plants</a>
+<!--                            <a href="#plant-shops" class="btn-get-started animated fadeInUp scrollto">Shop Plants</a>-->
+<!--                            <a href="/add" class="btn-get-started">Shop Plants</a>-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+            </a>
+
+            <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+            </a>
+
+        </div>
+    </section><!-- End Hero -->
+
+
+
+    <!-- ======= Plant Shops Section ======= -->
+    <section id="plant-shops" class="plant-shops">
+<!--    <section id="plant-shops">-->
+
+        <div class="main-section-title">
+            <h2>Plant Shops</h2>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3">
+        {% for item in all_items %}
+
+            <div class="col-lg-3 d-flex justify-content-center mt-5 align-items-stretch">
+                <a href="{{ url_for('item_detail', item_id=item.id) }}">
+                <div class="card" style="width: 15.7rem;">
+                    <img src="{{ item.img_sm_url }}" style="width:250px; height:330px"; class="card-img-top">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8 mb-2">
+
+                                <h6 class="card-title text-muted">{{ item.name }}</h6>
+                            </div>
+                            <div class="col-lg-4 mb-1">
+                            {% set price = (item.price - item.discount)|round(2) %}
+
+                                <p class="price text-muted" align="right">${{ (price|string).rstrip('00').rstrip('.') }}</p>
+                            </div>
+                        </div>
+
+<!--                        <div class="row">-->
+<!--                            <div class="col-lg-12 mb-3">-->
+<!--                                <h7 class="card-subtitle text-muted mb-1"> {{ item.size }} </h7>-->
+<!--                                 {{ item.org_price }}-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-3 d-flex align-items-center justify-content-center">-->
+<!--                                <a href="" class="btn btn-delete">Delete</a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+
+                        <div class="row">
+                            <div class="col-lg-12 mb-3">
+                                <h7 class="card-subtitle text-muted mb-1"> {{ item.size }} </h7>
+                            </div>
+                            <div class="col-lg-3 d-flex align-items-center justify-content-center">
+<!--                                <a href="" class="btn btn-delete">Delete</a>-->
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-lg-12 mb-3">
+<!--                            <div class="col-lg-3 d-flex align-items-center justify-content-center">-->
+
+                                <form action="{{ url_for('show_cart') }}" method="post">
+                                    <input name="action" value="add" hidden>
+                                    <input name="product_id" value="{{ item.id }}" hidden>
+                                    <input name="quantity" value="1" hidden>
+                                    <input name="status" value="active" hidden>
+                                    <button type="submit" class="button button-danger button-danger--big"><span class="btn-checkout--price">Add to Cart</span></button>
+
+                               </form>
+
+                                <!--                                <a href="" class="btn btn-delete">Delete</a>-->
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--                        <p class="card-text items">-->
+<!--                            {% if item.has_wifi == 1 %}-->
+<!--                            <i class="fas fa-wifi" aria-hidden="true"></i>-->
+<!--                            {% endif %}-->
+<!--                            {% if item.has_sockets == 1 %}-->
+<!--                            <i class="fas fa-plug" style="width: 1.25rem; text-align:center" aria-hidden="true"></i>-->
+<!--                            {% endif %}-->
+<!--                            {% if item.has_toilet == 1 %}-->
+<!--                            <i class="fas fa-toilet" aria-hidden="true"></i>-->
+<!--                            {% endif %}-->
+<!--                            {% if item.can_take_calls == 1 %}-->
+<!--                            <i class="fas fa-phone" aria-hidden="true"></i>-->
+<!--                            {% endif %}-->
+<!--                        </p>-->
+                    </div>
+                </div>
+                </a>
+            </div>
+        {% endfor %}
+
+        </div>
+    </section>
+
+
+
+{% include "footer.html" %}

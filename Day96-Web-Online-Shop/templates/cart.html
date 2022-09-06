@@ -1,0 +1,142 @@
+{% include "header.html" %}
+
+
+
+    <section id="shop-cart" class="shop-cart">
+
+{% set param_names = {"Shopping Cart": cart_list, "Saved for later": saved_list} %}
+
+{% set ns = namespace(subtotal=0) %}
+{% set ns_qty = namespace(count=0) %}
+
+
+{% for p_name, p_value in param_names.items() %}
+
+
+        <br>
+        <p><h3 style="text-align:left;">{{ p_name }}</h3></p>
+
+
+
+    {% if p_value|length == 0 %}
+        <br><br>
+        <p>Empty {{ p_name }}</p>
+
+
+    {% else %}
+        {% set cart_id = p_value[0].cart_id %}
+        {% if p_name == 'Shopping Cart' %}
+        <p>cart_id : {{ cart_id }}</p>
+        {% endif %}
+
+    <table border="1">
+        <tr align="center">
+<!--            <td>cart_id</td>-->
+            <td>item_id</td>
+            <td></td>
+            <td>name</td>
+            <td>size</td>
+
+            {% if p_name == "Shopping Cart" %}
+            <td>quantity</td>
+            {% endif %}
+
+            <td>price</td>
+            <td></td>
+            <td></td>
+        </tr>
+    {% for item in p_value %}
+
+        <tr align="center">
+<!--            <td>{{ item.cart_id }}</td>-->
+            <td>{{ item.product_id }}</td>
+            <td><a href="/item-detail/{{ item.product_id }}"><img src="{{ item.product.img_lg_url.replace('w=480', 'w=100&h=200') }}"></a></td>
+            <td><a href="/item-detail/{{ item.product_id }}">{{ item.product.name }}</a></td>
+
+            <td>{{ item.product.size }}</td>
+
+            {% if p_name == "Shopping Cart" %}
+            <td>
+                <form action="{{ url_for('show_cart') }}" method="post">
+                    <input name="action" value="update" hidden>
+                    <input name="update_id" value="{{ item.id }}" hidden>
+                    <input name="cart_id" value="{{ item.cart_id }}" hidden>
+                    <label for="quantity">Qty: </label>
+
+                    <select name="quantity" data-action="submit" id="quantity" onchange="this.form.submit()">
+                        {% for i in range(1, 11) %}
+                            {% if i == item.quantity %}
+                            <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                            <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+
+                </form>
+            </td>
+            {% endif %}
+
+
+
+            {% set price = (item.product.price - item.product.discount)|round(2) %}
+
+
+
+            {% set ns_qty.count = ns_qty.count + item.quantity %}
+
+            <td>${{ (price|string).rstrip('00').rstrip('.') }}
+                {% set ns.subtotal = ns.subtotal + (price) * (item.quantity|int) %}
+            <td>
+            <form action="{{ url_for('show_cart') }}" method="post">
+                <input name="action" value="delete" hidden>
+                <input name="delete_id" value="{{ item.id }}" hidden>
+                <input name="cart_id" value="{{ item.cart_id }}" hidden>
+                <input type="submit" value="Delete" style="border: none; background: none;">
+            </form>
+            </td>
+            <td>
+            <form action="{{ url_for('show_cart') }}" method="post">
+            {% if p_name == 'Shopping Cart' %}
+                <input name="action" value="saved" hidden>
+            {% elif p_name == 'Saved for later' %}
+                <input name="action" value="active" hidden>
+            {% endif %}
+
+                <input name="update_id" value="{{ item.id }}" hidden>
+                <input name="cart_id" value="{{ item.cart_id }}" hidden>
+
+            {% if p_name == 'Shopping Cart' %}
+                <input type="submit" value="Save for later" style="border: none; background: none;">
+            {% elif p_name == 'Saved for later' %}
+                <input type="submit" value="Move to cart" style="border: none; background: none;">
+            {% endif %}
+
+            </form>
+            </td>
+
+            </td>
+        </tr>
+
+    {% endfor %}
+    </table>
+
+    {% if p_name == 'Shopping Cart' %}
+        <p style="text-align:right;">Subtotal ({{ ns_qty.count }} items): ${{ (ns.subtotal|string).rstrip('00').rstrip('.') }}</p>
+        <p style="text-align:right;"><B>Total</B> (before tax and shipping): ${{ (ns.subtotal|string).rstrip('00').rstrip('.') }}</p>
+
+        <p style="text-align:right;"><a href="{{ url_for('order_items', cart_id=cart_id) }}"><button>Checkout</button></a></p>
+    {% endif %}
+
+{% endif %}
+
+{% endfor %}
+
+
+
+
+    </section>
+
+
+
+{% include "footer.html" %}

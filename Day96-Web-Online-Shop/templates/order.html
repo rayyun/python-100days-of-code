@@ -1,0 +1,67 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% include "header.html" %}
+
+
+
+    <section id="order-cart" class="order-cart">
+        <div>
+            <p><h1 style="text-align: left;">Order</h1></p>
+        </div>
+
+        <div>
+            <p>{{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}</p>
+        </div>
+
+
+        <div>
+            <br><br>
+            <p><h2 style="text-align: left;">Review items and shipping</h2></p>
+    {% set ns = namespace(subtotal=0) %}
+    {% set ns_qty = namespace(count=0) %}
+
+        <table border="1">
+            <tr>
+                <td>item_id</td>
+                <td></td>
+                <td>name</td>
+                <td>size</td>
+                <td>quantity</td>
+                <td>price</td>
+            </tr>
+
+
+        {% for item in cart_list %}
+
+            <tr>
+                <td>{{ item.product_id }}</td>
+                <td><a href="/item-detail/{{ item.product_id }}"><img src="{{ item.product.img_lg_url.replace('w=480', 'w=60&h=120') }}"></a></td>
+                <td><a href="/item-detail/{{ item.product_id }}">{{ item.product.name }}</a></td>
+
+                <td>{{ item.product.size }}</td>
+                <td>{{ item.quantity }}</td>
+
+                {% set price = (item.product.price - item.product.discount)|round(2) %}
+                {% set ns_qty.count = ns_qty.count + item.quantity %}
+
+
+                <td>${{ (price|string).rstrip('00').rstrip('.') }}
+                    {% set ns.subtotal = ns.subtotal + (price) * (item.quantity|int) %}
+
+                </td>
+            </tr>
+
+        {% endfor %}
+        </table>
+
+
+        </div>
+
+        <p style="text-align:right;">Subtotal ({{ ns_qty.count }} items): ${{ (ns.subtotal|string).rstrip('00').rstrip('.') }}</p>
+
+
+    </section>
+
+
+
+{% include "footer.html" %}

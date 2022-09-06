@@ -1,0 +1,21 @@
+
+
+{% include "header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-8">
+
+            <h1>Create Account</h1>
+            {{ wtf.quick_form(form, novalidate=True) }}
+
+            <p class="space-above"><a href="{{ url_for('home') }}">See all plants</a></p>
+        </div>
+    </div>
+</div>
+
+{% include "footer.html" %}

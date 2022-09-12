@@ -26,7 +26,15 @@ import upload_items
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+import json
+import os
+import stripe
+
+
+
 BASE_URL = "https://www.leonandgeorge.com"
+
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -34,7 +42,7 @@ Bootstrap(app)
 ## Connect to Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///plantshop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 ckeditor = CKEditor(app)
 db = SQLAlchemy(app)
 
@@ -421,12 +429,12 @@ def order_items():
 
 
     cart_id = request.args['cart_id']
-    print(cart_id)
+    # print(cart_id)
 
     cart_list = CartItem.query.filter_by(cart_id=cart_id, status='active').order_by(desc(CartItem.id)).all()
 
     # return render_template("order.html", cart_list=cart_list)
-    return render_template("order.html", form=form, cart_list=cart_list, current_user=current_user)
+    return render_template("checkout.html", form=form, cart_list=cart_list, current_user=current_user)
 
 
 
@@ -445,6 +453,45 @@ def order_items():
 # def show_cart(cart_id):
 #     return render_template("cart.html", cart_id=cart_id)
 
+
+
+def calculate_order_amount(items):
+    # Replace this constant with a calculation of the order's amount
+    # Calculate the order total on the server to prevent
+    # people from directly manipulating the amount on the client
+    return 1400
+
+
+@app.route('/create-payment-intent', methods=['POST'])
+def create_payment():
+    try:
+        data = json.loads(request.data)
+        # Create a PaymentIntent with the order amount and currency
+        intent = stripe.PaymentIntent.create(
+            amount=calculate_order_amount(data['items']),
+            currency='usd',
+            automatic_payment_methods={
+                'enabled': True,
+            },
+        )
+        return jsonify({
+            'clientSecret': intent['client_secret']
+        })
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+
+
+@app.route('/checkout')
+def checkout():
+    # data = request.
+    # intent = #
+    # return render_template("checkout-org.html" , client_secret=intent.client_secret)
+    return render_template("checkout.html")
+
+
+@app.route('/success')
+def transaction_success():
+    return render_template("success.html")
 
 
 if __name__ == "__main__":

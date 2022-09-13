@@ -417,24 +417,81 @@ def show_cart():
     return render_template("cart.html", cart_list=cart_list, saved_list=saved_list)
 
 
-@app.route("/order", methods=["GET", "POST"])
-def order_items():
+@app.route("/checkout", methods=["GET", "POST"])
+def checkout():
     if not current_user or not current_user.is_authenticated:
         flash("You need to login or register!")
         return redirect(url_for("login"))
 
-    form = AddressForm()
+    shipping_address = billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+    # billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+
+    print(shipping_address)
+
+
+    shipping_form = AddressForm()
+    billing_form = AddressForm()
+
+    s_status, b_status = '', ''
 
     # cart = Cart.query.filter_by(user_id=current_user.id).first()
 
 
-    cart_id = request.args['cart_id']
-    # print(cart_id)
+
+    cart_id = request.args['cart_id'] if 'cart_id' in request.args else request.form['cart_id']
+    print(cart_id)
 
     cart_list = CartItem.query.filter_by(cart_id=cart_id, status='active').order_by(desc(CartItem.id)).all()
 
+
+
+
+    if shipping_form.validate_on_submit():
+        new_address = UserAddress(
+            user_id=current_user.id,
+            type="shipping",
+            name=shipping_form.name.data,
+            street_1=shipping_form.street_1.data,
+            street_2=shipping_form.street_2.data,
+            city=shipping_form.city.data,
+            state=shipping_form.state.data,
+            zip_code=shipping_form.zip_code.data,
+            phone=shipping_form.phone.data
+        )
+
+        db.session.add(new_address)
+        db.session.commit()
+
+        return redirect(url_for("checkout", cart_id=cart_id))
+
+    elif request.method == "POST":
+        # if request.form['action'] == "confirm-shipping-address":
+
+        data = request.form
+        if data['action'] == "confirm-shipping-address":
+            shipping_address = UserAddress.query.filter_by(user_id=current_user.id, id=data['ship_address_id']).all()
+            print('elif - ', shipping_address)
+            print(cart_list)
+            # print(len(shipping_address))
+            cart_id = data['cart_id']
+            s_status = data['s_status']
+
+            # return redirect(url_for("checkout", cart_id=data['cart_id'], s_address=shipping_address, s_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user))
+            # return render_template("checkout.html", cart_id=data['cart_id'], s_address=shipping_address s_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status='confirmed')
+
+        elif data['action'] == "confirm-billing-address":
+            shipping_address = UserAddress.query.filter_by(user_id=current_user.id, id=data['ship_address_id']).all()
+            billing_address = UserAddress.query.filter_by(user_id=current_user.id, id=data['bill_address_id']).all()
+
+            cart_id = data['cart_id']
+
+            s_status = data['s_status']
+            b_status = data['b_status']
+
+            # return render_template("checkout.html", cart_id=data['cart_id'], s_address=shipping_address, b_address=billing_address, bs_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status='confirmed', b_status='confirmed')
+
     # return render_template("order.html", cart_list=cart_list)
-    return render_template("checkout.html", form=form, cart_list=cart_list, current_user=current_user)
+    return render_template("checkout.html", cart_id=cart_id, s_address=shipping_address, b_address=billing_address, s_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status=s_status, b_status=b_status)
 
 
 
@@ -481,12 +538,12 @@ def create_payment():
         return jsonify(error=str(e)), 403
 
 
-@app.route('/checkout')
-def checkout():
-    # data = request.
-    # intent = #
-    # return render_template("checkout-org.html" , client_secret=intent.client_secret)
-    return render_template("checkout.html")
+# @app.route('/checkout')
+# def checkout():
+#     # data = request.
+#     # intent = #
+#     # return render_template("checkout-org.html" , client_secret=intent.client_secret)
+#     return render_template("checkout.html")
 
 
 @app.route('/success')

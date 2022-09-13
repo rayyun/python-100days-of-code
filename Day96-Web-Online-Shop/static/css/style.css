@@ -2094,3 +2094,8 @@ screenand(max-width: 812px)and(orientation: landscape){
 .main {
   padding-top: 30px;
 }
+
+
+#addForm {
+  display: none;
+}

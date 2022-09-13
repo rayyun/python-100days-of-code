@@ -12,62 +12,14 @@
 <!--    <meta name="viewport" content="width=device-width, initial-scale=1" />-->
 
 
-    <section id="order-cart" class="order-cart">
+    <section id="order-cart" class="order-cart">'
         <div>
-            <p><h1 style="text-align: left;">Shipping Address</h1></p>
-        </div>
-
-        <div>
-            <p>{{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}</p>
-        </div>
-
-        <div>
-            <p><h1 style="text-align: left;">Billing Address</h1></p>
-        </div>
-
-        <div>
-            <p>{{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}</p>
-        </div>
-
-
-<!--        Stripe Payment   -->
-    <!--    <section id="stripe-payment">-->
-        <div id="stripe-payment">
-
-            <link rel="stylesheet" href="static/css/checkout.css" />
-            <script src="https://js.stripe.com/v3/"></script>
-            <script src="static/assets/js/checkout.js" defer></script>
-
-
-
-        <!--  </head>-->
-        <!--  <body>-->
-            <!-- Display a payment form -->
-            <form id="payment-form">
-              <div id="payment-element">
-                <!--Stripe.js injects the Payment Element-->
-              </div>
-              <button id="submit">
-                <div class="spinner hidden" id="spinner"></div>
-                <span id="button-text">Pay now</span>
-              </button>
-              <div id="payment-message" class="hidden"></div>
-            </form>
-        <!--  </body>-->
-        <!--</html>-->
-
-        </div>
-<!--    </section>-->
-
-
-
-
-
-        <div>
-            <br><br>
-            <p><h2 style="text-align: left;">Review items and shipping</h2></p>
+            <p><h3 style="text-align: left;">Review items and shipping</h3></p>
     {% set ns = namespace(subtotal=0) %}
     {% set ns_qty = namespace(count=0) %}
+    {% set ns_ship_address = namespace(id='') %}
+    {% set ns_bill_address = namespace(id='') %}
+
 
         <table border="1">
             <tr>
@@ -103,13 +55,282 @@
         {% endfor %}
         </table>
 
+        <p style="text-align:right;">Subtotal ({{ ns_qty.count }} items): ${{ (ns.subtotal|string).rstrip('00').rstrip('.') }}</p>
 
         </div>
 
-        <p style="text-align:right;">Subtotal ({{ ns_qty.count }} items): ${{ (ns.subtotal|string).rstrip('00').rstrip('.') }}</p>
+
+
+
+
+
+        <div>
+            <p><h3 style="text-align: left;">Shipping Address</h3></p>
+        </div>
+
+        {% if not s_address %}
+
+        <div>
+            <p>{{ wtf.quick_form(s_form, novalidate=True, button_map={"submit": "primary"}) }}</p>
+        </div>
+
+        {% else %}
+
+<script>
+function myfun() {
+  var x = document.getElementById('select_ship_address').selectedIndex;
+  var text = document.getElementsByTagName("option")[x].text;//its a text
+  document.getElementById("print_address").innerHTML = x + '<br>' + text.replace(' - ', '</p><p>');
+
+  document.getElementById("addForm").style.display = 'none';
+  document.getElementById("showForm").style.display = 'none';
+
+
+
+}
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+$(function() {
+  $("#showShippingForm").on("click", function() {
+    $("#addShippingForm").toggle();
+  });
+});
+
+
+$(function() {
+  $("#changeShippingForm").on("click", function() {
+    $("#addShippingForm").toggle();
+  });
+});
+
+$(function() {
+  $("#showBillingForm").on("click", function() {
+    $("#addBillingForm").toggle();
+    $("#billing-address-list").toggle();
+    $("#showBillingForm").toggle();
+    $("#same-as-shipping-address").toggle();
+  });
+});
+
+$(function() {
+  $("#changeBillingForm").on("click", function() {
+    $("#addBillingForm").toggle();
+  });
+});
+</script>
+
+        <div id="addFormContainer">
+            {% if s_address|length > 1 %}
+            <form action="{{ url_for('checkout') }}" method="post">
+                <input name="action" value="confirm-shipping-address" hidden>
+                <input name="cart_id" value="{{ cart_id }}" hidden>
+                <input name="s_status" value="confirmed" hidden>
+                <select name='ship_address_id' id='ship_address_id'  data-action="submit" onchange="this.form.submit()")">
+<!--                <select name='select_ship_address' id='select_ship_address' onchange="myfun()">-->
+<!--                <select name='select_ship_address' id='select_ship_address'>-->
+                    <option>Choose the address</option>
+                    {% for address in s_address %}
+                    <option value="{{ address.id }}">{{ address.name }} - {{ address.street_1 }} {{ address.street_2 }}, {{ address.city }}, {{ address.state }}, {{ address.zip_code }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+
+
+
+<!--                <p id='print_address'></p>-->
+
+
+            {% else %}
+<!--            {{ s_address }}-->
+                {% if s_status == 'confirmed' %}
+                    {% set  ns_ship_address.id = s_address[0].id %}
+                    shipping_address_id : {{ ns_ship_address.id }}
+                {% endif %}
+
+            <p>{{ s_address[0].name }}</p>
+            <p>
+                {{ s_address[0].street_1 }}<br>
+                {{ s_address[0].city }}, {{ s_address[0].state }}<br>
+                {{ s_address[0].zip_code }}
+            </p>
+            <p>{{ s_address[0].phone }}</p>
+
+
+
+            {% endif %}
+<!--        <div id="addFormContainer">-->
+
+
+
+<!--            <script src="/static/assets/js/jquery.js"></script>-->
+
+<!--<script>-->
+<!--function showhide(){-->
+<!--    var form = document.getElementById("addForm")-->
+
+<!--    if (form.style.display==='none'){-->
+<!--        form.style.display='inline';-->
+<!--    }else{-->
+<!--        form.style.display='none';-->
+
+<!--    }-->
+<!--}-->
+
+<!--</script>-->
+
+
+
+            {% if s_status != 'confirmed' %}
+
+            <p id="showShippingForm"><a href="#" onClick='showShippingForm'>Use different address</a></p>
+
+            {% else %}
+            <p id="changeShippingForm"><a href="#" onClick='changeShippingForm'>Change</a></p>
+
+
+            {% endif %}
+            <table id="addShippingForm" style="display: none;">
+                <tr>
+                    <td>{{ wtf.quick_form(s_form, novalidate=True, button_map={"submit": "primary"}) }}</td>
+                </tr>
+            </table>
+<!--            <table id="changeShippingForm" style="display: none;">-->
+<!--                <tr>-->
+<!--                    <td>{{ wtf.quick_form(s_form, novalidate=True, button_map={"submit": "primary"}) }}</td>-->
+<!--                </tr>-->
+<!--            </table>-->
+        </div>
+        {% endif %}
+
+        <div>
+            <p><h3 style="text-align: left;">Billing Address</h3></p>
+        </div>
+        <div>
+            {% if b_status == 'confirmed' %}
+                {% set  ns_bill_address.id = b_address[0].id %}
+                billing_address_id : {{ ns_bill_address.id }}
+<!--            billing_address_id : {{ b_address[0].id }}-->
+            <p>{{ b_address[0].name }}</p>
+            <p>
+                {{ b_address[0].street_1 }}<br>
+                {{ b_address[0].city }}, {{ b_address[0].state }}<br>
+                {{ b_address[0].zip_code }}
+            </p>
+            <p>{{ b_address[0].phone }}</p>
+            {% else %}
+            <form id="same-as-shipping-address" action="{{ url_for('checkout') }}" method="post">
+                <input name="action" value="confirm-billing-address" hidden>
+                <input name="cart_id" value="{{ cart_id }}" hidden>
+                <input name="s_status" value="{{ s_status }}" hidden>
+                <input name="b_status" value="confirmed" hidden>
+                <input name="ship_address_id" value="{{ s_address[0].id }}" hidden>
+                <input name="bill_address_id" value="{{ s_address[0].id }}" hidden>
+                <input type="checkbox" onclick="this.form.submit()">Same as shipping address</a></p>
+            </form>
+
+
+                {% if b_address|length > 1 %}
+                <form id="billing-address-list" action="{{ url_for('checkout') }}" method="post">
+                    <input name="action" value="confirm-billing-address" hidden>
+                    <input name="cart_id" value="{{ cart_id }}" hidden>
+                    <input name="s_status" value="{{ s_status }}" hidden>
+                    <input name="b_status" value="confirmed" hidden>
+                    <input name="ship_address_id" value="{{ s_address[0].id }}" hidden>
+                    <select name='bill_address_id' id='bill_address_id'  data-action="submit" onchange="this.form.submit()")">
+    <!--                <select name='select_ship_address' id='select_ship_address' onchange="myfun()">-->
+    <!--                <select name='select_ship_address' id='select_ship_address'>-->
+                        <option>Choose the address</option>
+                        {% for address in b_address %}
+                        <option value="{{ address.id }}">{{ address.name }} - {{ address.street_1 }} {{ address.street_2 }}, {{ address.city }}, {{ address.state }}, {{ address.zip_code }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                {% else %}
+    <!--            {{ s_address }}-->
+
+                <p>{{ b_address[0].name }}</p>
+                <p>
+                    {{ b_address[0].street_1 }}<br>
+                    {{ b_address[0].city }}, {{ b_address[0].state }}<br>
+                    {{ b_address[0].zip_code }}
+                </p>
+                <p>{{ b_address[0].phone }}</p>
+
+                {% endif %}
+
+                {% if b_status != 'confirmed' %}
+
+                <p id="showBillingForm"><a href="#" onClick='showBillingForm'>Use different address</a></p>
+
+                {% else %}
+                <p id="changeBillingForm"><a href="#" onClick='changeBillingForm'>Change</a></p>
+
+
+                {% endif %}
+                <table id="addBillingForm" style="display: none;">
+                    <tr>
+                        <td>{{ wtf.quick_form(b_form, novalidate=True, button_map={"submit": "primary"}) }}</td>
+                    </tr>
+                </table>
+
+
+            {% endif %}
+
+<!--            <form action="{{ url_for('checkout') }}" method="post">-->
+<!--                <input name="action" value="show-billing-form" hidden>-->
+<!--                <input name="cart_id" value="{{ cart_id }}" hidden>-->
+
+
+
+        </div>
+
+<!--        <div>-->
+<!--            <p>{{ wtf.quick_form(b_form, novalidate=True, button_map={"submit": "primary"}) }}</p>-->
+<!--        </div>-->
+
+
+<!--        Stripe Payment   -->
+    <!--    <section id="stripe-payment">-->
+        <div id="stripe-payment">
+            <p><h3 style="text-align: left;">Payment method</h3></p>
+
+            <link rel="stylesheet" href="static/css/checkout.css" />
+            <script src="https://js.stripe.com/v3/"></script>
+            <script src="static/assets/js/checkout.js" defer></script>
+
+
+
+        <!--  </head>-->
+        <!--  <body>-->
+            <!-- Display a payment form -->
+            <form id="payment-form">
+              <div id="payment-element">
+                <!--Stripe.js injects the Payment Element-->
+              </div>
+              <button id="submit">
+                <div class="spinner hidden" id="spinner"></div>
+                <span id="button-text">Pay now</span>
+              </button>
+              <div id="payment-message" class="hidden"></div>
+            </form>
+        <!--  </body>-->
+        <!--</html>-->
+
+        </div>
+<!--    </section>-->
+
+
+
+
+
 
 
     </section>
+
 
 
 

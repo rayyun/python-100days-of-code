@@ -1,12 +1,12 @@
 # Day96-Professional Portfolio Project 16 : Online Shop
 
-from bs4 import BeautifulSoup
-import bs4
+# from bs4 import BeautifulSoup
+# import bs4
 import requests
-import csv
-import cssutils
-import tinycss
-from tinycss.css21 import CSS21Parser
+# import csv
+# import cssutils
+# import tinycss
+# from tinycss.css21 import CSS21Parser
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, abort
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -443,6 +443,30 @@ def checkout():
 
     cart_list = CartItem.query.filter_by(cart_id=cart_id, status='active').order_by(desc(CartItem.id)).all()
 
+    cart_list_dict = []
+
+    for clist in cart_list:
+        cart_item_dict = {
+            "id": clist.id,
+            "cart_id": clist.cart_id,
+            "product_id": clist.product_id,
+            "quantity": clist.quantity,
+            "price": clist.product.price,
+            "discount": clist.product.discount
+        }
+
+        # print(cart_item_json)
+        # cart_json = cart_item_json.jsonify()
+        cart_list_dict.append(cart_item_dict)
+        # print(c_list._meta_data.keys)
+    # print((cart_list[0]))
+    # cart_json = jsonify(list(map(lambda x: x.to_dict(), cart_list)))
+
+    print(cart_list_dict)
+    cart_list_json = json.dumps(cart_list_dict)
+
+    print(cart_list_json)
+
 
 
 
@@ -491,7 +515,7 @@ def checkout():
             # return render_template("checkout.html", cart_id=data['cart_id'], s_address=shipping_address, b_address=billing_address, bs_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status='confirmed', b_status='confirmed')
 
     # return render_template("order.html", cart_list=cart_list)
-    return render_template("checkout.html", cart_id=cart_id, s_address=shipping_address, b_address=billing_address, s_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status=s_status, b_status=b_status)
+    return render_template("checkout.html", cart_id=cart_id, s_address=shipping_address, b_address=billing_address, s_form=shipping_form, b_form=billing_form, cart_list=cart_list, cart_list_json=cart_list_json, current_user=current_user, s_status=s_status, b_status=b_status)
 
 
 
@@ -516,7 +540,50 @@ def calculate_order_amount(items):
     # Replace this constant with a calculation of the order's amount
     # Calculate the order total on the server to prevent
     # people from directly manipulating the amount on the client
-    return 1400
+
+    print('here -----', items)
+    total = 0
+
+    print(type(items))
+    print(type(json.loads(items)))
+
+    for item in json.loads(items):
+        print('before - total', total)
+        print('item.quantity', item['quantity'])
+        print('item.price', item['price'])
+        print('item.discount', item['discount'])
+        total += item['quantity'] * (item['price'] - item['discount'])
+        print('after - total', total)
+
+    print(round(total*100))
+
+    return round(total*100)
+
+
+
+# def calculate_order_amount(items):
+#     # Replace this constant with a calculation of the order's amount
+#     # Calculate the order total on the server to prevent
+#     # people from directly manipulating the amount on the client
+#
+#     print('here -----', items)
+#     total = 0
+#
+#     print(type(items))
+#     print(type(json.loads(items)))
+#
+#     for item in json.loads(items):
+#         print('before - total', total)
+#         print('item.quantity', item['quantity'])
+#         print('item.price', item['price'])
+#         print('item.discount', item['discount'])
+#         total += item['quantity'] * (item['price'] - item['discount'])
+#         print('after - total', total)
+#
+#     print(round(total*100))
+# 
+#     return round(total*100)
+
 
 
 @app.route('/create-payment-intent', methods=['POST'])

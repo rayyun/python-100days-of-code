@@ -21,7 +21,7 @@ from flask_gravatar import Gravatar
 from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, URL
 import random
-from datetime import date
+from datetime import date, datetime
 import upload_items
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -75,6 +75,7 @@ class Product(db.Model):
     publishedAt = db.Column(db.String(50))
 
     cart_item = relationship("CartItem", back_populates="product")
+    order_item = relationship("OrderItem", back_populates="product")
 
 
 # User TABLE Configuration
@@ -152,7 +153,7 @@ class Order(db.Model):
 
     #Create Foreign Key, "user.id" the users refers to the tablename of User.
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    status = db.Column(db.String(10), nullable=False)
+    status = db.Column(db.String(20), nullable=False)
     sub_total = db.Column(db.Float, nullable=False)
     discount = db.Column(db.Float, nullable=False)
     tax = db.Column(db.Float, nullable=False)
@@ -160,6 +161,9 @@ class Order(db.Model):
     total = db.Column(db.Float, nullable=False)
     billing_address_id = db.Column(db.Integer, db.ForeignKey("user_address.id"))
     shipping_address_id = db.Column(db.Integer, db.ForeignKey("user_address.id"))
+    payment_desc = db.Column(db.String(36))
+    createdAt = db.Column(db.String(50), nullable=False)
+    updatedAt = db.Column(db.String(50), nullable=False)
 
 
 # OrderItems TABLE Configuration
@@ -176,6 +180,8 @@ class OrderItem(db.Model):
     createdAt = db.Column(db.String(50), nullable=False)
     updatedAt = db.Column(db.String(50), nullable=False)
 
+    product = relationship("Product", back_populates="order_item")
+
 
 db.create_all()
 
@@ -190,7 +196,8 @@ db.create_all()
 
 
 def get_today():
-    return date.today().strftime("%m-%d-%Y %H:%M:%S")
+    print(datetime.today().strftime("%m-%d-%Y %H:%M:%S"))
+    return datetime.today().strftime("%m-%d-%Y %H:%M:%S")
 
 
 @app.route("/")
@@ -428,13 +435,26 @@ def checkout():
 
     print(shipping_address)
 
+    cart = Cart.query.filter_by(user_id=current_user.id).first()
+
 
     shipping_form = AddressForm()
+    # print(type(cart.cart_user.first_name), cart.cart_user.last_name)
+    shipping_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
+    shipping_form.action.default = "confirm_shipping_address"
+    shipping_form.s_status.default = "confirmed"
+    shipping_form.process()
+
     billing_form = AddressForm()
+    # print(cart.cart_user.first_name, cart.cart_user.last_name)
+    billing_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
+    billing_form.action.default = "confirm_billing_address"
+    billing_form.s_status.default = "confirmed"
+    billing_form.b_status.default = "confirmed"
+    billing_form.process()
 
     s_status, b_status = '', ''
 
-    # cart = Cart.query.filter_by(user_id=current_user.id).first()
 
 
 
@@ -443,32 +463,27 @@ def checkout():
 
     cart_list = CartItem.query.filter_by(cart_id=cart_id, status='active').order_by(desc(CartItem.id)).all()
 
+    # cart_list_dict = []
+    #
+    # for clist in cart_list:
+    #     cart_item_dict = {
+    #         "id": clist.id,
+    #         "cart_id": clist.cart_id,
+    #         "product_id": clist.product_id,
+    #         "quantity": clist.quantity,
+    #         "price": clist.product.price,
+    #         "discount": clist.product.discount,
+    #     }
+    #
+    #     cart_list_dict.append(cart_item_dict)
+    #
+    # print(type(cart_list_dict), cart_list_dict)
+    # cart_list_json = json.dumps(cart_list_dict)
+    #
+    # print(type(cart_list_json), cart_list_json)
+
     cart_list_dict = []
-
-    for clist in cart_list:
-        cart_item_dict = {
-            "id": clist.id,
-            "cart_id": clist.cart_id,
-            "product_id": clist.product_id,
-            "quantity": clist.quantity,
-            "price": clist.product.price,
-            "discount": clist.product.discount
-        }
-
-        # print(cart_item_json)
-        # cart_json = cart_item_json.jsonify()
-        cart_list_dict.append(cart_item_dict)
-        # print(c_list._meta_data.keys)
-    # print((cart_list[0]))
-    # cart_json = jsonify(list(map(lambda x: x.to_dict(), cart_list)))
-
-    print(cart_list_dict)
-    cart_list_json = json.dumps(cart_list_dict)
-
-    print(cart_list_json)
-
-
-
+    cart_list_json = ''
 
     if shipping_form.validate_on_submit():
         new_address = UserAddress(
@@ -512,6 +527,62 @@ def checkout():
             s_status = data['s_status']
             b_status = data['b_status']
 
+
+            for clist in cart_list:
+                cart_item_dict = {
+                    "id": clist.id,
+                    "cart_id": clist.cart_id,
+                    "user_id": current_user.id,
+                    "product_id": clist.product_id,
+                    "quantity": clist.quantity,
+                    "price": clist.product.price,
+                    "discount": clist.product.discount,
+                    "ship_address_id": int(data['ship_address_id']),
+                    "bill_address_id" : int(data['bill_address_id'])
+                }
+
+                cart_list_dict.append(cart_item_dict)
+
+            print(type(cart_list_dict), cart_list_dict)
+            cart_list_json = json.dumps(cart_list_dict)
+
+            print(type(cart_list_json), cart_list_json)
+
+            # order_subtotal = 0
+            # order_discount = 0
+            # order_tax = 0
+            # order_shipping = 0
+            #
+            # for item in cart_list_dict:
+            #     order_subtotal += item['price'] * item['quantity']
+            #     order_discount += item['discount'] * item['quantity']
+            #
+            # order_total = order_subtotal - order_discount + (order_subtotal - order_discount) * order_tax + order_shipping
+            #
+            #
+            #
+            # # insert order / order_item table
+            # new_order = Order(
+            #     user_id=current_user.id,
+            #     status='NC',
+            #     sub_total=order_subtotal,
+            #     discount=order_discount,
+            #     tax=order_tax,
+            #     shipping=order_shipping,
+            #     total=order_total,
+            #     billing_address_id=int(data['bill_address_id']),
+            #     shipping_address_id=int(data['ship_address_id'])
+            # )
+            #
+            # db.session.add(new_order)
+            # db.session.flush()
+            # order_id = new_order.id
+            # print(order_id)
+            #
+            # db.session.commit()
+            #
+
+
             # return render_template("checkout.html", cart_id=data['cart_id'], s_address=shipping_address, b_address=billing_address, bs_form=shipping_form, b_form=billing_form, cart_list=cart_list, current_user=current_user, s_status='confirmed', b_status='confirmed')
 
     # return render_template("order.html", cart_list=cart_list)
@@ -533,6 +604,8 @@ def checkout():
 # @app.route("/show-cart/<int:cart_id>", methods=["GET", "POST"])
 # def show_cart(cart_id):
 #     return render_template("cart.html", cart_id=cart_id)
+
+
 
 
 
@@ -581,8 +654,70 @@ def calculate_order_amount(items):
 #         print('after - total', total)
 #
 #     print(round(total*100))
-# 
+#
 #     return round(total*100)
+
+
+
+def insert_order(items):
+    print('---- insert order ---')
+    print(items)
+    print(type(items))
+
+    order_subtotal = 0
+    order_discount = 0
+    order_tax = 0
+    order_shipping = 0
+    user_id, ship_address_id, bill_address_id = 0, 0, 0
+
+    for item in json.loads(items):
+        order_subtotal += item['price'] * item['quantity']
+        order_discount += item['discount'] * item['quantity']
+        user_id = item['user_id']
+        ship_address_id = item['ship_address_id']
+        bill_address_id = item['bill_address_id']
+
+    order_total = order_subtotal - order_discount + (order_subtotal - order_discount) * order_tax + order_shipping
+
+    # insert order / order_item table
+    new_order = Order(
+        user_id=user_id,
+        status='pending',
+        sub_total=order_subtotal,
+        discount=order_discount,
+        tax=order_tax,
+        shipping=order_shipping,
+        total=order_total,
+        billing_address_id=bill_address_id,
+        shipping_address_id=ship_address_id,
+        payment_desc='',
+        createdAt=get_today(),
+        updatedAt=get_today()
+    )
+
+    db.session.add(new_order)
+    db.session.flush()
+    order_id = new_order.id
+    print(order_id)
+    db.session.commit()
+
+
+    for item in json.loads(items):
+        new_order_item = OrderItem(
+            order_id=order_id,
+            product_id=item['product_id'],
+            price=item['price'],
+            discount=item['discount'],
+            quantity=item['quantity'],
+            createdAt=get_today(),
+            updatedAt=get_today()
+        )
+
+        db.session.add(new_order_item)
+        db.session.commit()
+
+
+
 
 
 
@@ -598,6 +733,12 @@ def create_payment():
                 'enabled': True,
             },
         )
+
+        insert_order(data['items'])
+
+        print('create_payment : ', jsonify({'clientSecret': intent['client_secret']}))
+
+
         return jsonify({
             'clientSecret': intent['client_secret']
         })
@@ -615,7 +756,82 @@ def create_payment():
 
 @app.route('/success')
 def transaction_success():
-    return render_template("success.html")
+    if not current_user or not current_user.is_authenticated:
+        flash("You need to login or register!")
+        return redirect(url_for("login"))
+
+
+    print("----success----")
+
+    print(f"user_id : {current_user.id}")
+    # print(f"cart_id : {cart_id}")
+    print(request.args.to_dict(flat=False))
+    print(type(request.args))
+
+    transaction_result = request.args.to_dict(flat=False)
+    print(transaction_result)
+
+    current_order_items = ''
+
+    if transaction_result['redirect_status'][0] == 'succeeded':
+        current_order = Order.query.filter_by(user_id=current_user.id, status='pending').order_by(desc(Order.id)).first()
+
+        order_id = current_order.id
+
+        print('order_id : ', type(order_id), order_id)
+
+        # current_order = Order.query.get(order_id)
+
+        current_order.status = 'processing'
+        current_order.payment_desc = transaction_result['payment_intent'][0]
+        current_order.updatedAt = get_today()
+        db.session.commit()
+
+        current_order_items = OrderItem.query.filter_by(order_id=order_id).all()
+        cart_id = Cart.query.filter_by(user_id=current_user.id).order_by(desc(Cart.id)).first().id
+
+        for c_order_item in current_order_items:
+            delete_cart_item = CartItem.query.filter_by(cart_id=cart_id, product_id=c_order_item.product_id, status='active').first()
+            db.session.delete(delete_cart_item)
+            db.session.commit()
+
+
+    print('current_order_items: ', current_order_items)
+
+    return render_template("success.html", order=current_order, order_items=current_order_items, result=transaction_result['redirect_status'][0])
+
+
+@app.route('/order-history')
+def order_history():
+    if not current_user or not current_user.is_authenticated:
+        flash("You need to login or register!")
+        return redirect(url_for("login"))
+
+    order_list = []
+
+    all_orders = Order.query.filter_by(user_id=current_user.id, status='processing').order_by(desc(Order.id)).all()
+
+    for order in all_orders:
+        order_dict = {}
+        print(order.id, type(order.id))
+        order_dict['id'] = order.id
+        order_dict['order'] = order
+        order_dict['order_items'] = []
+
+        print("order_dict['id'] :", type(order_dict['id']))
+        all_order_items = OrderItem.query.filter_by(order_id=order.id).order_by(desc(OrderItem.id)).all()
+
+        for order_item in all_order_items:
+            print(order_item.product_id)
+            order_dict['order_items'].append(order_item)
+
+        order_list.append(order_dict)
+
+    print(order_list)
+
+
+    return render_template("order_history.html", order_list=order_list)
+
 
 
 if __name__ == "__main__":

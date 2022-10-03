@@ -1,0 +1,33 @@
+{% include "header.html" %}
+
+<br><br><br><br>
+<h1>Order History</h1>
+<table border="1">
+<!--{{ order_list }}-->
+{% for order in order_list %}
+    <tr>
+        <td colspan="5">
+            <span>Order # {{ order['order'].id }}</span>
+            <span>Order date : {{ order['order'].updatedAt }}</span>
+            <span>Total : ${{ (order['order'].total|string).rstrip('00').rstrip('.') }}</span>
+        </td>
+    </tr>
+    {% for item in order['order_items'] %}
+    <tr>
+        <td>
+            <a href="/item-detail/{{ item.product_id }}">
+            <span><img src="{{ item.product.img_lg_url.replace('w=480', 'w=60&h=120') }}"></span>
+            <span>{{ item.product.name }}</span>
+            </a>
+        </td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ (item.price|string).rstrip('00').rstrip('.') }}</td>
+        <td>Subtotal: ${{ (((item.price - item.discount) * item.quantity)|string).rstrip('00').rstrip('.') }}</td>
+        <td></td>
+    </tr>
+    {% endfor %}
+
+
+{% endfor %}
+</table>
+{% include "footer.html" %}

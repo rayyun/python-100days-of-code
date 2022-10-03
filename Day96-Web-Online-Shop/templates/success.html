@@ -1,0 +1,22 @@
+{% include "header.html" %}
+
+<br><br><br><br>
+{% if result == 'succeeded' %}
+<h1>Thanks for ordering</h1>
+{% endif %}
+
+<div>
+    <p>Order Number : {{ order.id }}</p>
+    <p>Total : ${{ (order.total|string).rstrip('00').rstrip('.') }}</p>
+<table>
+    {% for item in order_items %}
+    <tr>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.product.size }}</td>
+    </tr>
+    {% endfor %}
+</table>
+    <a href="{{ url_for('order_history') }}">Order history</a>
+</div>
+{% include "footer.html" %}

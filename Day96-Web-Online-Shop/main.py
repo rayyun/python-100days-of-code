@@ -430,35 +430,69 @@ def checkout():
         flash("You need to login or register!")
         return redirect(url_for("login"))
 
-    shipping_address = billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+    if 's_status' in request.args and request.args['s_status'] == 'confirmed':
+        shipping_address = [request.args['s_address']]
+        s_status = request.args['s_status']
+    else:
+        # shipping_address = billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+        shipping_address =  UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+
+
+    if 'b_status' in request.args and request.args['b_status'] == 'confirmed':
+        billing_address = [request.args['b_address']]
+        b_status = request.args['b_status']
+    else:
+        # shipping_address = billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+        billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
+
+        if not billing_address:
+            billing_address = ""
+
+
+        s_status = ''
     # billing_address = UserAddress.query.filter_by(user_id=current_user.id).order_by(desc(UserAddress.id)).all()
 
-    print(shipping_address)
+    # if 'b_status' in request.args and request.args['b_status'] == 'confirmed':
+    #     billing_address = [request.args['b_address']]
+    #     b_status = request.args['b_status']
+
+    print("shipping_address : ", shipping_address)
 
     cart = Cart.query.filter_by(user_id=current_user.id).first()
 
-
     shipping_form = AddressForm()
+
+    # if request.method == 'GET' and shipping_address:
+    if request.method == 'GET':
     # print(type(cart.cart_user.first_name), cart.cart_user.last_name)
-    shipping_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
-    shipping_form.action.default = "confirm_shipping_address"
-    shipping_form.s_status.default = "confirmed"
-    shipping_form.process()
+        shipping_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
+        shipping_form.action.default = "confirm_shipping_address"
+        shipping_form.s_status.default = "confirmed"
+        shipping_form.process()
+
+    # shipping_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
+    # shipping_form.process()
 
     billing_form = AddressForm()
-    # print(cart.cart_user.first_name, cart.cart_user.last_name)
-    billing_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
-    billing_form.action.default = "confirm_billing_address"
-    billing_form.s_status.default = "confirmed"
-    billing_form.b_status.default = "confirmed"
-    billing_form.process()
 
-    s_status, b_status = '', ''
+    # if billing_address:
+    if request.method == 'GET':
+    # print(cart.cart_user.first_name, cart.cart_user.last_name)
+        billing_form.name.default = f'{cart.cart_user.first_name} {cart.cart_user.last_name}'
+        billing_form.action.default = "confirm_billing_address"
+        billing_form.s_status.default = "confirmed"
+        billing_form.b_status.default = "confirmed"
+        billing_form.process()
+
+    # s_status, b_status = '', ''
+    # s_status =
 
 
 
 
     cart_id = request.args['cart_id'] if 'cart_id' in request.args else request.form['cart_id']
+    s_status = request.args['s_status'] if 's_status' in request.args else ''
+    b_status = request.args['b_status'] if 'b_status' in request.args else ''
     print(cart_id)
 
     cart_list = CartItem.query.filter_by(cart_id=cart_id, status='active').order_by(desc(CartItem.id)).all()
@@ -486,6 +520,7 @@ def checkout():
     cart_list_json = ''
 
     if shipping_form.validate_on_submit():
+        print("shipping_form.submit")
         new_address = UserAddress(
             user_id=current_user.id,
             type="shipping",
@@ -499,11 +534,16 @@ def checkout():
         )
 
         db.session.add(new_address)
+        db.session.flush()
+        shipping_address = new_address
         db.session.commit()
 
-        return redirect(url_for("checkout", cart_id=cart_id))
+        print(shipping_address)
+
+        return redirect(url_for("checkout", cart_id=cart_id, s_status='confirmed', s_address=shipping_address))
 
     elif request.method == "POST":
+        print("post")
         # if request.form['action'] == "confirm-shipping-address":
 
         data = request.form

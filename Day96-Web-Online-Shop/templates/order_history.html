@@ -1,33 +1,90 @@
 {% include "header.html" %}
 
-<br><br><br><br>
-<h1>Order History</h1>
-<table border="1">
-<!--{{ order_list }}-->
-{% for order in order_list %}
-    <tr>
-        <td colspan="5">
-            <span>Order # {{ order['order'].id }}</span>
+<section id="order-history" class="my-5 py-3 px-5 mx-auto">
+  <div class="container py-3">
+    <div class="row d-flex justify-content-center align-items-center">
+      <div class="col-12">
+
+        <div class="py-3 h-300">
+          <h3 class="fw-normal mb-0 text-black">Order History</h3>
+        </div>
+
+<!--        <div class="d-flex justify-content-between align-items-center mb-4">-->
+<!--          <h3 class="fw-normal mb-0 text-black">Order History</h3>-->
+<!--        </div>-->
+      {% if order_list|length == 0 %}
+
+        <div class="card border-0 mb-4">
+          <div class="card-body bg-light p-4">
+
+            <div class="row d-flex justify-content-between align-items-center">
+            <p>Order Not Found</p>
+            </div>
+          </div>
+        </div>
+
+      {% else %}
+        {% for order in order_list %}
+      <div class="card card-order rounded-3">
+          <div class="card-body">
+
+
+            <div class="row d-flex justify-content-between align-items-center">
+<!--                <div>-->
+                <span>Order # {{ order['order'].id }}</span>
+
             <span>Order date : {{ order['order'].updatedAt }}</span>
             <span>Total : ${{ (order['order'].total|string).rstrip('00').rstrip('.') }}</span>
-        </td>
-    </tr>
-    {% for item in order['order_items'] %}
-    <tr>
-        <td>
-            <a href="/item-detail/{{ item.product_id }}">
-            <span><img src="{{ item.product.img_lg_url.replace('w=480', 'w=60&h=120') }}"></span>
-            <span>{{ item.product.name }}</span>
-            </a>
-        </td>
-        <td>{{ item.quantity }}</td>
-        <td>${{ (item.price|string).rstrip('00').rstrip('.') }}</td>
-        <td>Subtotal: ${{ (((item.price - item.discount) * item.quantity)|string).rstrip('00').rstrip('.') }}</td>
-        <td></td>
-    </tr>
-    {% endfor %}
+            </div>
+          </div>
+      </div>
+
+        <div class="card card-order rounded-3 mb-4">
+          <div class="card-body p-4">
 
 
-{% endfor %}
-</table>
+        {% for item in order['order_items'] %}
+
+            <div class="row d-flex justify-content-between align-items-center">
+              <div class="col-md-1 col-lg-1 col-xl-1">
+                  <a href="/item-detail/{{ item.product_id }}">
+                  <img src="{{ item.product.img_lg_url.replace('w=480', 'w=60&h=120') }}" class="img-fluid rounded-2">
+                  </a>
+              </div>
+              <div class="col-md-4 col-lg-4 col-xl-4">
+                  <a href="/item-detail/{{ item.product_id }}"><p><h6 class="card-title text-muted">{{ item.product.name }}</h6></p></a>
+                <p><h7 class="card-subtitle text-muted mb-1">{{ item.product.size }}</h7></p>
+              </div>
+              <div>
+                  <h7 class="text-subtotal text-muted mb-1">Qty: </h7><h6 class="card-subtitle mb-0 text-muted">{{ item.quantity }}</h6>
+              </div>
+              <div>
+                <h7 class="text-subtotal text-muted mb-1">Price: </h7><h6 class="price card-subtitle mb-0 text-muted">${{ (item.price|string).rstrip('00').rstrip('.') }}</h6>
+              </div>
+              <div>
+                  <h7 class="text-subtotal text-muted">Subtotal: </h7>
+                <h6 class="price card-subtitle mb-0 text-muted">
+                    ${{ (((item.price - item.discount) * item.quantity)|string).rstrip('00').rstrip('.') }}
+              </h6>
+              </div>
+
+            </div>
+          {% endfor %}
+
+
+
+
+          </div>
+        </div>
+      {% endfor %}
+
+    {% endif %}
+
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
 {% include "footer.html" %}

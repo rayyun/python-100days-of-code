@@ -2477,5 +2477,20 @@ body{
 }
 
 .product-image {
-    width: 80%;
+    width: 70%;
+}
+
+.form #submit {
+    background: #ad8b73;
+    border: 1px solid transparent;
+}
+
+.link-word {
+    color: #ad8b73;
+    text-decoration: none;
+}
+
+.link-word:hover {
+    color: #ad8b73;
+    text-decoration: none;
 }

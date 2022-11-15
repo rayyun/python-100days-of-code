@@ -1,21 +1,17 @@
+{% include "header.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% include "header.html" %}
 
-
-<br><br><br><br><br>
-  <div class="container">
+<br><br><br>
+  <div class="container my-3 py-3">
     <div class="row">
 
-      <div class="col-lg-8 col-md-10 mx-auto content my-3 py-3">
+      <div class="user-form col-lg-8 col-md-10 mx-auto my-3 py-3">
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
 
-        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
       </div>
-<!--    </div>-->
-<!--    <div class="row my-5 py-5">-->
-      <div class="col-lg-8 col-md-10 mx-auto my-3 py-3">
-
-        <p class="my-5 py-5">New customer? <a href="{{ url_for('register', user_type='user') }}">Start here...</a></p>
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <p class="my-3 py-3">New customer? <a href="{{ url_for('register', user_type='user') }}" class="link-word">Sign Up here...</a></p>
       </div>
     </div>
   </div>

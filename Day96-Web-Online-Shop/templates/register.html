@@ -1,19 +1,15 @@
-
-
 {% include "header.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-
-
-
 <div class="container">
     <div class="row">
-        <div class="col-sm-12 col-md-8">
+        <div class="col-sm-12 col-md-8 mx-auto my-5 py-5">
 
             <h1>Create Account</h1>
-            {{ wtf.quick_form(form, novalidate=True) }}
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+<!--        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}-->
 
-            <p class="space-above"><a href="{{ url_for('home') }}">See all plants</a></p>
+<!--            <p class="space-above"><a href="{{ url_for('home') }}">See all plants</a></p>-->
         </div>
     </div>
 </div>

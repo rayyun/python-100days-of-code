@@ -303,7 +303,7 @@ def item_detail(item_id):
     # item = db.session.query(Product).get(item_id)
     item = Product.query.get(item_id)
 
-    return render_template("item_detail2.html", item=item)
+    return render_template("item_detail.html", item=item)
 
 
 @app.route("/show-cart", methods=["GET", "POST"])

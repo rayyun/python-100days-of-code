@@ -14,7 +14,7 @@ body {
 }
 
 a {
-  color: #006fbe;
+  color: c;
   text-decoration: none;
 }
 
@@ -95,6 +95,34 @@ h1, h2, h3, h4, h5, h6, h7, h8 {
 /**
 * Desktop Navigation
 */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #212529;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link {
+    transition: none;
+  }
+}
+.nav-link:hover, .nav-link:focus {
+  color: #0085A1;
+}
+.nav-link.disabled {
+  color: #6c757d;
+  pointer-events: none;
+  cursor: default;
+}
 .main_navbar {
   padding: 0;
 }
@@ -429,6 +457,10 @@ h1, h2, h3, h4, h5, h6, h7, h8 {
   background: #ceab93;
 }
 
+#plant-shops {
+    padding-top: 80px;
+}
+
 #plant-shops .btn-delete {
   font-family: "Raleway", sans-serif;
   font-weight: 500;
@@ -458,11 +490,17 @@ h1, h2, h3, h4, h5, h6, h7, h8 {
   color: inherit;
 }
 
-
+/*
 #shop-cart {
   width: 100%;
   padding: 100px 100px;
 }
+
+#saved-list {
+  width: 100%;
+  padding: 100px 100px;
+}
+*/
 
 
 #order-cart {
@@ -778,6 +816,7 @@ h1 {
 .footer {
     width: 80%;
     height: 100px;
+    margin-top: -180px;
     margin-left: auto;
     margin-right: auto;
     background-color: #ad8b73;
@@ -2098,4 +2137,345 @@ screenand(max-width: 812px)and(orientation: landscape){
 
 #addForm {
   display: none;
+}
+
+
+
+/*----- shop-cart-2 --------*/
+/*
+body{
+    background: #ddd;
+    min-height: 100vh;
+    vertical-align: middle;
+    display: flex;
+    font-family: sans-serif;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+*/
+
+#shop-cart-2 .title{
+    margin-bottom: 5vh;
+}
+
+#shop-cart-2 .card{
+    margin: auto;
+    max-width: 950px;
+    width: 90%;
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 1rem;
+    border: transparent;
+}
+
+#shop-cart-2 @media(max-width:767px){
+    .card{
+        margin: 3vh auto;
+    }
+}
+
+#shop-cart-2 .cart{
+    background-color: #fff;
+    padding: 4vh 5vh;
+    border-bottom-left-radius: 1rem;
+    border-top-left-radius: 1rem;
+}
+
+#shop-cart-2 @media(max-width:767px){
+    .cart{
+        padding: 4vh;
+        border-bottom-left-radius: unset;
+        border-top-right-radius: 1rem;
+    }
+}
+
+#shop-cart-2 .summary{
+    background-color: #ddd;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    padding: 4vh;
+    color: rgb(65, 65, 65);
+}
+
+#shop-cart-2 @media(max-width:767px){
+    .summary{
+    border-top-right-radius: unset;
+    border-bottom-left-radius: 1rem;
+    }
+}
+
+#shop-cart-2 .summary .col-2{
+    padding: 0;
+}
+
+#shop-cart-2 .summary .col-10
+{
+    padding: 0;
+}
+
+#shop-cart-2 .row{
+    margin: 0;
+}
+
+#shop-cart-2 .title b{
+    font-size: 1.5rem;
+}
+
+#shop-cart-2 .main{
+    margin: 0;
+    padding: 2vh 0;
+    width: 100%;
+}
+
+#shop-cart-2 .col-2, .col{
+    padding: 0 1vh;
+}
+
+#shop-cart-2 a{
+    padding: 0 1vh;
+}
+
+#shop-cart-2 .close{
+    margin-left: auto;
+    font-size: 0.7rem;
+}
+
+#shop-cart-2 img{
+    width: 3.5rem;
+}
+
+#shop-cart-2 .back-to-shop{
+    margin-top: 4.5rem;
+}
+
+#shop-cart-2 h5{
+    margin-top: 4vh;
+}
+
+#shop-cart-2 hr{
+    margin-top: 1.25rem;
+}
+
+#shop-cart-2 form{
+    padding: 2vh 0;
+}
+#shop-cart-2 select{
+    border: 1px solid rgba(0, 0, 0, 0.137);
+    padding: 1.5vh 1vh;
+    margin-bottom: 4vh;
+    outline: none;
+    width: 100%;
+    background-color: rgb(247, 247, 247);
+}
+
+#shop-cart-2 input{
+    border: 1px solid rgba(0, 0, 0, 0.137);
+    padding: 1vh;
+    margin-bottom: 4vh;
+    outline: none;
+    width: 100%;
+    background-color: rgb(247, 247, 247);
+}
+
+#shop-cart-2 input:focus::-webkit-input-placeholder
+{
+      color:transparent;
+}
+
+#shop-cart-2 .btn{
+    background-color: #000;
+    border-color: #000;
+    color: white;
+    width: 100%;
+    font-size: 0.7rem;
+    margin-top: 4vh;
+    padding: 1vh;
+    border-radius: 0;
+}
+
+#shop-cart-2 .btn:focus{
+    box-shadow: none;
+    outline: none;
+    box-shadow: none;
+    color: white;
+    -webkit-box-shadow: none;
+    -webkit-user-select: none;
+    transition: none;
+}
+
+#shop-cart-2 .btn:hover{
+    color: white;
+}
+
+#shop-cart-2 a{
+    color: black;
+}
+
+#shop-cart-2 a:hover{
+    color: black;
+    text-decoration: none;
+}
+
+#shop-cart-2 #code{
+    background-image: linear-gradient(to left, rgba(255, 255, 255, 0.253) , rgba(255, 255, 255, 0.185)), url("https://img.icons8.com/small/16/000000/long-arrow-right.png");
+    background-repeat: no-repeat;
+    background-position-x: 95%;
+    background-position-y: center;
+}
+
+.form-control-sm {
+    width: 50px;
+}
+
+.submit-text {
+    color: #ad8b73;
+    border: none;
+    background: none;
+}
+
+.btn-checkout {
+    background-color: #ad8b73;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 14px 32px;
+    margin-bottom : 30px;
+    border-radius: 4px;
+    transition: 0.5s;
+    line-height: 1;
+    color: #fff;
+    -webkit-animation-delay: 0.8s;
+    animation-delay: 0.8s;
+    background: #ad8b73;
+    align: right;
+}
+
+.cart-align {
+    text-align: right;
+}
+
+.text-subtotal {
+    font-size: 12px;
+}
+
+.text-small {
+    font-size: 14px;
+}
+
+.card-order {
+   padding-left: 20px;
+   padding-right: 20px;
+}
+
+.review-table {
+    text-align: center;
+}
+
+.review-img {
+    width: 40px;
+    height: 60px;
+    border-radius: 5px;
+}
+
+.review-table-header {
+    font-size: 15px;
+    color: #ad8b73;
+}
+
+.address {
+    font-size: 15px;
+    line-height: 20px;
+}
+
+.product .title {
+    max-width: 80%;
+    margin-bottom: 0;
+    font-family: "Shne Schmal Halbfett", sans-serif;
+    font-size: 56px;
+    line-height: 1;
+    color: #343537;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+}
+
+.title .product__subtitle {
+    font-size: 0.5em;
+    display: block;
+}
+
+.product .product__meta {
+    width: 100%;
+    padding-top: 9px;
+    display: block;
+    font-family: "Shne Mono, sans-serif";
+    font-size: 12px;
+    color: #545454;
+    letter-spacing: .9px;
+    text-transform: uppercase;
+}
+
+#btn-checkout {
+    flex-basis: 67%;
+}
+
+#btn-checkout:hover {
+    color: #e46d5f;
+    background: rgba(228, 109, 95, 0.2);
+    border-color: #e46d5f;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+.product. title .product__subtitle {
+    font-size: .5em;
+    display: block
+}
+
+.product__price .discounted {
+    color:#e46d5f
+}
+
+.product .title {
+    max-width:80%
+}
+
+.product .title {
+    max-width:70%;
+    margin-bottom:0;
+    font-family:Shne Schmal Halbfett,sans-serif;
+    font-size:56px;
+    line-height:1;
+    color:#343537;
+    text-transform:uppercase;
+    letter-spacing:.2px
+}
+
+@media (max-width:768px) {
+    .product .title {
+        font-size:42px
+    }
+}
+
+.product .product__price {
+    font-family:Shne Schmal Halbfett,sans-serif;
+    font-size:32px;
+    line-height:1.22;
+    color:#343537;
+    text-transform:uppercase
+}
+
+@media (max-width:768px) {
+    .product .product__price{font-size:26px}
+}
+
+.title .product__subtitle {
+    font-size:.5em;
+    display:block;
+}
+
+.product-image {
+    width: 80%;
 }
